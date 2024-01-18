@@ -4,30 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de QR</title>
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
-    <h1>Gestión de QR</h1>
+    <h1>Gestión de QR - Escáner de cámara</h1>
 
-    <input type="file" accept="image/*" capture="camera" id="qr-input" />
+    <video id="video"></video>
     <button onclick="escanearQR()">Escanear QR</button>
 
     <script>
+        let scanner;
+
+        function iniciarCamara() {
+            const video = document.getElementById('video');
+
+            Instascan.Camera.getCameras().then(cameras => {
+                if (cameras.length > 0) {
+                    scanner = new Instascan.Scanner({ video: video });
+
+                    scanner.addListener('scan', function (contenido) {
+                        // Aquí puedes verificar el contenido del código QR.
+                        console.log(contenido);
+                    });
+
+                    Instascan.Camera.getCameras().then(cameras => {
+                        if (cameras.length > 0) {
+                            scanner.start(cameras[0]);
+                        } else {
+                            console.error('No se encontraron cámaras.');
+                        }
+                    }).catch(err => console.error(err));
+                } else {
+                    console.error('No se encontraron cámaras.');
+                }
+            }).catch(err => console.error(err));
+        }
+
         function escanearQR() {
-            const input = document.getElementById('qr-input');
-            const file = input.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    const resultado = e.target.result;
-                    // Aquí puedes enviar el resultado a tu servidor para verificar la identificación del QR.
-                    console.log(resultado);
-                };
-
-                reader.readAsDataURL(file);
+            if (scanner) {
+                scanner.start();
+            } else {
+                console.error('El escáner no está inicializado.');
             }
         }
+
+        // Iniciar la cámara al cargar la página
+        window.addEventListener('load', iniciarCamara);
     </script>
 </body>
 </html>
