@@ -10,9 +10,14 @@
     <h1>Gestión de QR - Escáner de cámara</h1>
 
     <video id="video"></video>
+    
     <button onclick="escanearQR()">Escanear QR</button>
 
+    <p id="confirmacion"></p>
+
     <script>
+        var confirmacion;
+        confirmacion = document.getElementById('confirmacion');
         let scanner;
 
         function iniciarCamara() {
@@ -34,8 +39,7 @@
                 if (camera) {
                     scanner = new Instascan.Scanner({ video: video });
                     scanner.addListener('scan', function (contenido) {
-                        // Aquí puedes verificar el contenido del código QR.
-                        console.log(contenido);
+                        validarQR(contenido); // Llama a la función de validación
                     });
                     scanner.start(camera);
                 } else {
@@ -49,6 +53,19 @@
                 scanner.start();
             } else {
                 console.error('El escáner no está inicializado.');
+            }
+        }
+
+        // Función de validación de QR
+        function validarQR(contenido) {
+            const codigosValidos = ["Identificador_1", "Identificador_2", "Identificador_3", "Identificador_4", "Identificador_5", "Identificador_6", "Identificador_7", "Identificador_8", "Identificador_9", "Identificador_10"];
+
+            if (codigosValidos.includes(contenido)) {
+                console.log("QR válido");
+                confirmacion.textContent = 'si';
+            } else {
+                console.log("QR no válido");
+                confirmacion.textContent = 'no';
             }
         }
 
